@@ -8,8 +8,8 @@
  ******************************************************************************/
 
 // ------------------ RECURSION PROTECTION -------------------------------------
-#ifndef FACE_ALIGNMENT_CASCADE_HPP
-#define FACE_ALIGNMENT_CASCADE_HPP
+#ifndef FACE_ALIGNMENT_DCFE_HPP
+#define FACE_ALIGNMENT_DCFE_HPP
 
 // ----------------------- INCLUDES --------------------------------------------
 #include <FaceAlignment.hpp>
@@ -54,6 +54,20 @@ public:
     const FaceAnnotation &ann
     );
 
+  tensorflow::Status
+  imageToTensor
+    (
+    const cv::Mat &img,
+    std::vector<tensorflow::Tensor>* output_tensors
+    );
+
+  std::vector<cv::Mat>
+  tensorToMaps
+    (
+    const tensorflow::Tensor &img_tensor,
+    const cv::Size &face_size
+    );
+
 private:
   std::string _path;
   std::vector<unsigned int> _cnn_landmarks;
@@ -62,4 +76,4 @@ private:
 
 } // namespace upm
 
-#endif /* FACE_ALIGNMENT_CASCADE_HPP */
+#endif /* FACE_ALIGNMENT_DCFE_HPP */

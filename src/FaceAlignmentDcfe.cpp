@@ -28,81 +28,6 @@ const cv::Size FACE_SIZE = cv::Size(160,160);
 // Restrictions and Caveats:
 //
 // -----------------------------------------------------------------------------
-tensorflow::Status
-imageToTensor
-  (
-  const cv::Mat &img,
-  std::vector<tensorflow::Tensor>* output_tensors
-  )
-{
-  /// Copy mat into a tensor
-  tensorflow::Tensor img_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({img.rows,img.cols,img.channels()}));
-  auto img_tensor_mapped = img_tensor.tensor<float,3>();
-  const uchar *pixel_coordinates = img.ptr<uchar>();
-  for (unsigned int i=0; i < img.rows; i++)
-    for (unsigned int j=0; j < img.cols; j++)
-      for (unsigned int k=0; k < img.channels(); k++)
-        img_tensor_mapped(i,j,k) = pixel_coordinates[i*img.cols*img.channels() + j*img.channels() + k];
-
-  /// The convention for image ops in TensorFlow is that all images are expected
-  /// to be in batches, so that they're four-dimensional arrays with indices of
-  /// [batch, height, width, channel]. Because we only have a single image, we
-  /// have to add a batch dimension of 1 to the start with ExpandDims()
-  tensorflow::Scope root = tensorflow::Scope::NewRootScope();
-  auto holder = tensorflow::ops::Placeholder(root.WithOpName("input"), tensorflow::DataType::DT_FLOAT);
-  auto expander = tensorflow::ops::ExpandDims(root.WithOpName("expander"), holder, 0);
-  auto divider = tensorflow::ops::Div(root.WithOpName("normalized"), expander, {255.0f});
-
-  /// This runs the GraphDef network definition that we've just constructed
-  tensorflow::GraphDef graph;
-  TF_RETURN_IF_ERROR(root.ToGraphDef(&graph));
-  std::unique_ptr<tensorflow::Session> session(tensorflow::NewSession(tensorflow::SessionOptions()));
-  TF_RETURN_IF_ERROR(session->Create(graph));
-  std::vector<std::pair<std::string,tensorflow::Tensor>> input_tensors = {{"input", img_tensor},};
-  TF_RETURN_IF_ERROR(session->Run({input_tensors}, {"normalized"}, {}, output_tensors));
-  return tensorflow::Status::OK();
-};
-
-// -----------------------------------------------------------------------------
-//
-// Purpose and Method:
-// Inputs:
-// Outputs:
-// Dependencies:
-// Restrictions and Caveats:
-//
-// -----------------------------------------------------------------------------
-std::vector<cv::Mat>
-tensorToMaps
-  (
-  const tensorflow::Tensor &img_tensor,
-  const cv::Size &face_size
-  )
-{
-  tensorflow::TTypes<float>::ConstFlat data = img_tensor.flat<float>();
-  unsigned int num_channels = static_cast<unsigned int>(img_tensor.dim_size(0));
-  unsigned int channel_size = static_cast<unsigned int>(img_tensor.dim_size(1));
-  std::vector<cv::Mat> channels(num_channels);
-  for (unsigned int i=0; i < num_channels; i++)
-  {
-    std::vector<float> vec(channel_size);
-    for (unsigned int j=0; j < channel_size; j++)
-      vec[j] = data(i*channel_size+j);
-    channels[i] = cv::Mat(face_size.height, face_size.width, CV_32FC1);
-    memcpy(channels[i].data, vec.data(), vec.size()*sizeof(float));
-  }
-  return channels;
-};
-
-// -----------------------------------------------------------------------------
-//
-// Purpose and Method:
-// Inputs:
-// Outputs:
-// Dependencies:
-// Restrictions and Caveats:
-//
-// -----------------------------------------------------------------------------
 void
 FaceAlignmentDcfe::parseOptions
   (
@@ -287,6 +212,81 @@ FaceAlignmentDcfe::process
 
   /// Testing ERT model
   UPM_PRINT("Testing ERT will be released soon ...");
+};
+
+// -----------------------------------------------------------------------------
+//
+// Purpose and Method:
+// Inputs:
+// Outputs:
+// Dependencies:
+// Restrictions and Caveats:
+//
+// -----------------------------------------------------------------------------
+tensorflow::Status
+FaceAlignmentDcfe::imageToTensor
+  (
+  const cv::Mat &img,
+  std::vector<tensorflow::Tensor>* output_tensors
+  )
+{
+  /// Copy mat into a tensor
+  tensorflow::Tensor img_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({img.rows,img.cols,img.channels()}));
+  auto img_tensor_mapped = img_tensor.tensor<float,3>();
+  const uchar *pixel_coordinates = img.ptr<uchar>();
+  for (unsigned int i=0; i < img.rows; i++)
+    for (unsigned int j=0; j < img.cols; j++)
+      for (unsigned int k=0; k < img.channels(); k++)
+        img_tensor_mapped(i,j,k) = pixel_coordinates[i*img.cols*img.channels() + j*img.channels() + k];
+
+  /// The convention for image ops in TensorFlow is that all images are expected
+  /// to be in batches, so that they're four-dimensional arrays with indices of
+  /// [batch, height, width, channel]. Because we only have a single image, we
+  /// have to add a batch dimension of 1 to the start with ExpandDims()
+  tensorflow::Scope root = tensorflow::Scope::NewRootScope();
+  auto holder = tensorflow::ops::Placeholder(root.WithOpName("input"), tensorflow::DataType::DT_FLOAT);
+  auto expander = tensorflow::ops::ExpandDims(root.WithOpName("expander"), holder, 0);
+  auto divider = tensorflow::ops::Div(root.WithOpName("normalized"), expander, {255.0f});
+
+  /// This runs the GraphDef network definition that we've just constructed
+  tensorflow::GraphDef graph;
+  TF_RETURN_IF_ERROR(root.ToGraphDef(&graph));
+  std::unique_ptr<tensorflow::Session> session(tensorflow::NewSession(tensorflow::SessionOptions()));
+  TF_RETURN_IF_ERROR(session->Create(graph));
+  std::vector<std::pair<std::string,tensorflow::Tensor>> input_tensors = {{"input", img_tensor},};
+  TF_RETURN_IF_ERROR(session->Run({input_tensors}, {"normalized"}, {}, output_tensors));
+  return tensorflow::Status::OK();
+};
+
+// -----------------------------------------------------------------------------
+//
+// Purpose and Method:
+// Inputs:
+// Outputs:
+// Dependencies:
+// Restrictions and Caveats:
+//
+// -----------------------------------------------------------------------------
+std::vector<cv::Mat>
+FaceAlignmentDcfe::tensorToMaps
+  (
+  const tensorflow::Tensor &img_tensor,
+  const cv::Size &face_size
+  )
+{
+  tensorflow::TTypes<float>::ConstFlat data = img_tensor.flat<float>();
+  unsigned int num_channels = static_cast<unsigned int>(img_tensor.dim_size(0));
+  unsigned int channel_size = static_cast<unsigned int>(img_tensor.dim_size(1));
+  std::vector<cv::Mat> channels(num_channels);
+  for (unsigned int i=0; i < num_channels; i++)
+  {
+    std::vector<float> vec(channel_size);
+    for (unsigned int j=0; j < channel_size; j++)
+      vec[j] = data(i*channel_size+j);
+    channels[i] = cv::Mat(face_size.height, face_size.width, CV_32FC1);
+    memcpy(channels[i].data, vec.data(), vec.size()*sizeof(float));
+  }
+  return channels;
 };
 
 } // namespace upm
