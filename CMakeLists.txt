@@ -5,12 +5,22 @@ project(bobetocalo_eccv18)
 cmake_minimum_required(VERSION 3.2)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../CMakeLists.txt)
-#include(${CMAKE_CURRENT_LIST_DIR}/../bobetocalo_ert/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/../ert_simple/CMakeLists.txt)
+
+#-- Setup required libraries
+find_package(OpenMP)
+if(OPENMP_FOUND)
+  message(STATUS FOUND_OPENMP)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -std=c++11")
+else()
+  message(STATUS NOT_FOUND_OPENMP)
+endif()
 
 #-- Find include files
 set(face_alignment_bobetocalo_eccv18_include
   ${faces_framework_include}
-  #${face_alignment_bobetocalo_ert_include}
+  ${face_alignment_ert_simple_include}
   ${CMAKE_CURRENT_LIST_DIR}/tensorflow/
   ${CMAKE_CURRENT_LIST_DIR}/tensorflow/bazel-genfiles
   ${CMAKE_CURRENT_LIST_DIR}/tensorflow/tensorflow/contrib/makefile/downloads/eigen
@@ -20,8 +30,9 @@ set(face_alignment_bobetocalo_eccv18_include
 
 set(face_alignment_bobetocalo_eccv18_src
   ${faces_framework_src}
-  #${face_alignment_bobetocalo_ert_src}
-  ${CMAKE_CURRENT_LIST_DIR}/src/FaceAlignmentDcfe.cpp
+  ${face_alignment_ert_simple_src}
+  ${CMAKE_CURRENT_LIST_DIR}/src/FaceAlignment3dde.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/HonariChannelFeatures.cpp
 )
 
 set(face_alignment_bobetocalo_eccv18_test
@@ -33,7 +44,7 @@ set(CMAKE_INSTALL_RPATH ${CMAKE_CURRENT_LIST_DIR}/tensorflow/bazel-bin/tensorflo
 
 set(face_alignment_bobetocalo_eccv18_libs
   ${faces_framework_libs}
-  #${face_alignment_bobetocalo_ert_libs}
+  ${face_alignment_ert_simple_libs}
   ${CMAKE_CURRENT_LIST_DIR}/tensorflow/bazel-bin/tensorflow/libtensorflow_cc.so
   dl
   pthread
@@ -51,5 +62,5 @@ foreach(test ${face_alignment_bobetocalo_eccv18_test})
     ${test}
   )
   target_link_libraries(${test_name} ${face_alignment_bobetocalo_eccv18_libs})
-  add_test(NAME ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} COMMAND ${test_name} --database 300w_public)
+  add_test(NAME ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} COMMAND ${test_name} --database 300w_public --measure pupils)
 endforeach()

@@ -14,7 +14,7 @@
 
 #include <trace.hpp>
 #include <FaceAnnotation.hpp>
-#include <FaceAlignmentDcfe.hpp>
+#include <FaceAlignment3dde.hpp>
 #include <utils.hpp>
 
 // -----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ main
 
   /// Load face components
   boost::shared_ptr<upm::FaceComposite> composite(new upm::FaceComposite());
-  boost::shared_ptr<upm::FaceAlignment> fa(new upm::FaceAlignmentDcfe("data/"));
+  boost::shared_ptr<upm::FaceAlignment> fa(new upm::FaceAlignment3dde("data/"));
   composite->addComponent(fa);
 
   /// Parse face component options

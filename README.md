@@ -12,12 +12,14 @@ European Conference on Computer Vision, ECCV 2018, Munich, Germany, September 8-
 
 #### Requisites
 - faces_framework https://github.com/bobetocalo/faces_framework
+- ert_simple https://github.com/bobetocalo/ert_simple
 
 #### Installation
 This repository must be located inside the following directory:
 ```
 faces_framework
     └── alignment
+        └── ert_simple
         └── bobetocalo_eccv18
 ```
 You need to have a C++ compiler (supporting C++11):
@@ -31,5 +33,5 @@ You need to have a C++ compiler (supporting C++11):
 #### Usage
 Use the --database option to load the proper trained model.
 ```
-> ./release/face_alignment_bobetocalo_eccv18_test --database 300w_public
+> ./release/face_alignment_bobetocalo_eccv18_test --database 300w_public --measure pupils
 ```

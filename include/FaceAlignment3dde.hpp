@@ -1,5 +1,5 @@
 /** ****************************************************************************
- *  @file    FaceAlignmentDcfe.hpp
+ *  @file    FaceAlignment3dde.hpp
  *  @brief   Face detection and recognition framework
  *  @author  Roberto Valle Fernandez
  *  @date    2018/10
@@ -8,26 +8,26 @@
  ******************************************************************************/
 
 // ------------------ RECURSION PROTECTION -------------------------------------
-#ifndef FACE_ALIGNMENT_DCFE_HPP
-#define FACE_ALIGNMENT_DCFE_HPP
+#ifndef FACE_ALIGNMENT_3DDE_HPP
+#define FACE_ALIGNMENT_3DDE_HPP
 
 // ----------------------- INCLUDES --------------------------------------------
 #include <FaceAlignment.hpp>
+#include <ShapeCascade.hpp>
 #include <opencv2/opencv.hpp>
-#include "tensorflow/core/public/session.h"
 
 namespace upm {
 
 /** ****************************************************************************
- * @class FaceAlignmentDcfe
+ * @class FaceAlignment3dde
  * @brief Class used for facial feature point detection.
  ******************************************************************************/
-class FaceAlignmentDcfe: public FaceAlignment
+class FaceAlignment3dde: public FaceAlignment
 {
 public:
-  FaceAlignmentDcfe(std::string path) : _path(path) {};
+  FaceAlignment3dde(std::string path) : _path(path) {};
 
-  ~FaceAlignmentDcfe() {};
+  ~FaceAlignment3dde() {};
 
   void
   parseOptions
@@ -54,26 +54,11 @@ public:
     const FaceAnnotation &ann
     );
 
-  tensorflow::Status
-  imageToTensor
-    (
-    const cv::Mat &img,
-    std::vector<tensorflow::Tensor>* output_tensors
-    );
-
-  std::vector<cv::Mat>
-  tensorToMaps
-    (
-    const tensorflow::Tensor &img_tensor,
-    const cv::Size &face_size
-    );
-
 private:
   std::string _path;
-  std::vector<unsigned int> _cnn_landmarks;
-  std::unique_ptr<tensorflow::Session> _session;
+  std::vector<ShapeCascade> _sp;
 };
 
 } // namespace upm
 
-#endif /* FACE_ALIGNMENT_DCFE_HPP */
+#endif /* FACE_ALIGNMENT_3DDE_HPP */
