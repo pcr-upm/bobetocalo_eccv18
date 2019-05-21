@@ -165,7 +165,7 @@ void
 HonariChannelFeatures::loadChannelsGenerator()
 {
   /// Loading CNN model
-  std::string trained_model = "data/" + _database + ".pb";
+  std::string trained_model = "faces_framework/alignment/bobetocalo_eccv18/data/" + _database + ".pb";
   tensorflow::GraphDef graph;
   tensorflow::Status load_graph_status = ReadBinaryProto(tensorflow::Env::Default(), trained_model, &graph);
   if (not load_graph_status.ok())

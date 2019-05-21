@@ -17,6 +17,7 @@
 #include <ModernPosit.h>
 #include <ChannelFeatures.hpp>
 #include <HonariChannelFeatures.hpp>
+#include <GaussianChannelFeatures.hpp>
 #include <LearningAlgorithm.hpp>
 #include <transformation.hpp>
 #include <cereal/access.hpp>
@@ -117,6 +118,19 @@ public:
         for (const std::vector<impl::RegressionTree> &forest : _forests[i])
           for (const impl::RegressionTree &tree : forest)
             addResidualToShape(tree.leafs[tree.predict(features)].residual, current_shapes[j]);
+      }
+      if (_feats_convergence_iter == i)
+      {
+        cf.reset(new GaussianChannelFeatures(_robust_shape, _robust_label));
+        feat_bbox = cf->enlargeBbox(box_scaled.pos);
+        feat_channels = cf->generateChannels(img, feat_bbox);
+        cv::Point2f feat_scale = cv::Point2f(feat_channels[0].cols/feat_bbox.width, feat_channels[0].rows/feat_bbox.height);
+        feat_bbox = cv::Rect_<float>(box_scaled.pos.x-feat_bbox.x, box_scaled.pos.y-feat_bbox.y, box_scaled.pos.width, box_scaled.pos.height);
+        feat_bbox.x *= feat_scale.x;
+        feat_bbox.y *= feat_scale.y;
+        feat_bbox.width *= feat_scale.x;
+        feat_bbox.height *= feat_scale.y;
+        feat_utform = unnormalizingTransform(feat_bbox, _shape_size);
       }
     }
     /// Facial feature location obtained

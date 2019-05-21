@@ -33,6 +33,7 @@ set(face_alignment_bobetocalo_eccv18_src
   ${face_alignment_ert_simple_src}
   ${CMAKE_CURRENT_LIST_DIR}/src/FaceAlignment3dde.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/HonariChannelFeatures.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/GaussianChannelFeatures.cpp
 )
 
 set(face_alignment_bobetocalo_eccv18_test
