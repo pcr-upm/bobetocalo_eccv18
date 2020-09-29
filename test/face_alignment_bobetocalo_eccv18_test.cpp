@@ -54,7 +54,7 @@ main
     unsigned int feature_idx = upm::DB_LANDMARKS[cont];
     float x = coords[(2*cont)+0];
     float y = coords[(2*cont)+1];
-    bool visible = true;
+    float occluded = 0.0f;
     if (feature_idx < 1)
       continue;
     for (const auto &part : upm::DB_PARTS)
@@ -63,7 +63,7 @@ main
         upm::FaceLandmark landmark;
         landmark.feature_idx = feature_idx;
         landmark.pos = cv::Point2f(x,y);
-        landmark.visible = visible;
+        landmark.occluded = occluded;
         ann.parts[part.first].landmarks.push_back(landmark);
         break;
       }

@@ -178,7 +178,7 @@ public:
         landmark.feature_idx = static_cast<unsigned int>(feature_idx);
         landmark.pos.x = lnd.x*(prob_bbox.width/channel.cols);
         landmark.pos.y = lnd.y*(prob_bbox.height/channel.rows);
-        landmark.visible = true;
+        landmark.occluded = 0.0f;
         face_cnn.parts[db_part.first].landmarks.push_back(landmark);
         shape_idx++;
       }
@@ -209,7 +209,7 @@ public:
           unsigned int shape_idx = std::distance(index_all.begin(), std::find(index_all.begin(),index_all.end(),feature_idx));
           landmark.pos.x = (prob_bbox.x + image_all_proj[shape_idx].x) / scale;
           landmark.pos.y = (prob_bbox.y + image_all_proj[shape_idx].y) / scale;
-          landmark.visible = true;
+          landmark.occluded = 0.0f;
           initial_face.parts[db_part.first].landmarks.push_back(landmark);
         }
       std::vector<float> values = getProbabilityMetric(initial_face.parts, prob_channels, prob_bbox, scale, map_scale);
@@ -241,10 +241,7 @@ public:
         unsigned int shape_idx = std::distance(index_all.begin(),std::find(index_all.begin(), index_all.end(), feature_idx));
         landmark.pos.x = (prob_bbox.x + image_all_proj[shape_idx].x) / scale;
         landmark.pos.y = (prob_bbox.y + image_all_proj[shape_idx].y) / scale;
-        landmark.visible = not((db_part.first == FacePartLabel::lear and headpose.x < -30.0f) or
-                               (db_part.first == FacePartLabel::rear and headpose.x > 30.0f) or
-                              ((db_part.first == FacePartLabel::leye or db_part.first == FacePartLabel::leyebrow) and headpose.x < -45.0f) or
-                              ((db_part.first == FacePartLabel::reye or db_part.first == FacePartLabel::reyebrow) and headpose.x > 45.0f));
+        landmark.occluded = 0.0f;
         initial_face.parts[db_part.first].landmarks.push_back(landmark);
       }
     return initial_face;
