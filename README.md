@@ -24,6 +24,7 @@ https://doi.org/10.1016/j.cviu.2019.102846
 #### Requisites
 - faces_framework https://github.com/bobetocalo/faces_framework
 - ert_simple https://github.com/bobetocalo/ert_simple
+- Tensorflow (v1.8.0)
 
 #### Installation
 This repository must be located inside the following directory:
@@ -46,5 +47,5 @@ Use the --measure option to set the face alignment normalization.
 
 Use the --database option to load the proper trained model.
 ```
-> ./release/face_alignment_bobetocalo_eccv18_test --database 300w_public --measure pupils
+> ./release/face_alignment_bobetocalo_eccv18_test --measure pupils --database 300w_public
 ```
