@@ -42,6 +42,8 @@ You need to have a C++ compiler (supporting C++11):
 > cd ..
 ```
 #### Usage
+Use the --measure option to set the face alignment normalization. 
+
 Use the --database option to load the proper trained model.
 ```
 > ./release/face_alignment_bobetocalo_eccv18_test --database 300w_public --measure pupils
